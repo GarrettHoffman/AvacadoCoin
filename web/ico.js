@@ -10,16 +10,16 @@ const contractAddress = '0xA292375e9343f1684e36a03b56bCe6E0664aD1f9';
 
 /// getting contract
 const web3 = new Web3(new Web3.providers.HttpProvider(targetApi));
-const avacadoTokenIco = web3.eth.contract(abi).at(contractAddress);
+const avocadoTokenIco = web3.eth.contract(abi).at(contractAddress);
 
 /// read and display values
 writeValue('contractAddress', contractAddress);
-writeValue('totalRaised', toEthString(avacadoTokenIco.totalRaised()));
+writeValue('totalRaised', toEthString(avocadoTokenIco.totalRaised()));
 
-const startDate = hexSecondsToMillis(avacadoTokenIco.startTimestamp());
-const endDate = startDate + hexSecondsToMillis(avacadoTokenIco.durationSeconds());
+const startDate = hexSecondsToMillis(avocadoTokenIco.startTimestamp());
+const endDate = startDate + hexSecondsToMillis(avocadoTokenIco.durationSeconds());
 writeValue('startDate', new Date(startDate).toLocaleString());
 writeValue('endDate', new Date(endDate).toLocaleString());
 
-writeValue('minCap', toEthString(avacadoTokenIco.minCap()));
-writeValue('maxCap', toEthString(avacadoTokenIco.maxCap()));
+writeValue('minCap', toEthString(avocadoTokenIco.minCap()));
+writeValue('maxCap', toEthString(avocadoTokenIco.maxCap()));

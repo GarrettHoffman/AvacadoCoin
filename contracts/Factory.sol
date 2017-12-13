@@ -1,6 +1,6 @@
 pragma solidity ^0.4.15;
 
-import 'contracts/AvacadoCoinIco.sol';
+import 'contracts/AvocadoCoinIco.sol';
 
 contract Factory {
 
@@ -10,7 +10,7 @@ contract Factory {
         uint256 _minCapEth,
         uint256 _maxCapEth) returns(address created) 
     {
-        return new EspeoTokenIco(
+        return new AvocadoCoinIco(
             _fundsWallet,
             _startTimestamp,
             _minCapEth * 1 ether,

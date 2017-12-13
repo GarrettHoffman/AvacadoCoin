@@ -1,11 +1,11 @@
-pragma solidity ^0.4.4;
+pragma solidity ^0.4.15;
 
 import './node_modules/zeppelin-solidity/contracts/token/StandardToken.sol';
 
-contract AvacadoCoinIco is StandardToken {
+contract AvocadoCoinIco is StandardToken {
     using SafeMath for uint256;
 
-    string public name = "AvacadoCoin";
+    string public name = "AvocadoCoin";
     string public symbol = "CADO";
     uint256 public decimals = 18;
 
@@ -24,7 +24,7 @@ contract AvacadoCoinIco is StandardToken {
      */
     address public fundsWallet;
 
-    function AvacadoCoinIco(
+    function AvocadoCoinIco(
         address _fundsWallet,
         uint256 _startTimestamp,
         uint256 _minCap,
@@ -52,7 +52,7 @@ contract AvacadoCoinIco is StandardToken {
     }
 
     function calculateTokenAmount(uint256 weiAmount) constant returns(uint256) {
-        // standard rate: 1 ETH : 50 ESP
+        // standard rate: 1 ETH : 50 CADO
         uint256 tokenAmount = weiAmount.mul(50);
         if (now <= startTimestamp + 7 days) {
             // +50% bonus during first week

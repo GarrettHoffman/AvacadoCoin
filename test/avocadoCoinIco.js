@@ -1,4 +1,4 @@
-const AvacadoCoinIco = artifacts.require('./AvacadoCoinIco.sol');
+const AvocadoCoinIco = artifacts.require('./AvocadoCoinIco.sol');
 
 // various test utility functions
 const transaction = (address, wei) => ({
@@ -37,7 +37,7 @@ const timeController = (() => {
   };
 })();
 
-contract('AvacadoCoinIco', accounts => {
+contract('AvocadoCoinIco', accounts => {
 
   const fundsWallet = accounts[1];
   const buyerOneWallet = accounts[2];
@@ -48,20 +48,20 @@ contract('AvacadoCoinIco', accounts => {
   const minCap = toWei(2);
   const maxCap = toWei(5);
 
-  const createToken = () => AvacadoCoinIco.new(fundsWallet, timeController.currentTimestamp(), minCap, maxCap);
+  const createToken = () => AvocadoCoinIco.new(fundsWallet, timeController.currentTimestamp(), minCap, maxCap);
 
-  // REQ001: Basic ERC20 “Espeo Token” with symbol of “ESP”, 
+  // REQ001: Basic ERC20 “Avocado Coin” with symbol of “CADO”, 
   // 18 decimals (reflecting ether’s smallest unit - wei) 
   // and total supply of 1,000,000 units created at contract deployment 
   // and assigned to a specific wallet,
   it('should have initial supply of 1,000,000 units assigned to funds wallet', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
     const expectedSupply = toWei(1000000);
 
-    const totalSupply = await espeoToken.totalSupply();
+    const totalSupply = await avocadoCoin.totalSupply();
     assert.equal(totalSupply, expectedSupply, 'Total supply mismatch');
 
-    const fundsWalletBalance = await espeoToken.balanceOf(fundsWallet);
+    const fundsWalletBalance = await avocadoCoin.balanceOf(fundsWallet);
     assert.equal(fundsWalletBalance.toNumber(), expectedSupply, 'Initial funds wallet balance mismatch');
   });
 
@@ -70,63 +70,63 @@ contract('AvacadoCoinIco', accounts => {
   // if the goal is not met the ICO continues until the payments reach the min cap
   it('should open at startTimestamp', async () => {
     const startTimestamp = timeController.currentTimestamp() + 3600;
-    const espeoToken = await AvacadoCoinIco.new(fundsWallet, startTimestamp, minCap, maxCap);
+    const avocadoCoin = await AvocadoCoinIco.new(fundsWallet, startTimestamp, minCap, maxCap);
 
     // should be closed
-    await assertExpectedError(espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth)));
+    await assertExpectedError(avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth)));
 
     await timeController.addSeconds(3600);
 
     // should be open
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
   });
 
   it('should last 4 weeks if the goal is reached and allow token transfers afterwards', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, minCap));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, minCap));
     await timeController.addDays(4 * 7);
 
     // should be closed
-    await assertExpectedError(espeoToken.sendTransaction(transaction(buyerTwoWallet, oneEth)));
+    await assertExpectedError(avocadoCoin.sendTransaction(transaction(buyerTwoWallet, oneEth)));
 
-    const totalRaised = await espeoToken.totalRaised();
+    const totalRaised = await avocadoCoin.totalRaised();
     assert.equal(totalRaised.toNumber(), minCap, 'Total raised amount mismatch')
 
     // REQ004 should allow token transfer
-    await espeoToken.transfer(buyerTwoWallet, 1, { from: buyerOneWallet });
+    await avocadoCoin.transfer(buyerTwoWallet, 1, { from: buyerOneWallet });
   });
 
   it('should last more then 4 weeks if the goal is not reached and allow token transfers after closing', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
     await timeController.addDays(4 * 7 + 1);
 
     // should still be open
-    await espeoToken.sendTransaction(transaction(buyerTwoWallet, minCap - oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerTwoWallet, minCap - oneEth));
 
     // should be closed
-    await assertExpectedError(espeoToken.sendTransaction(transaction(buyerThreeWallet, oneEth)));
+    await assertExpectedError(avocadoCoin.sendTransaction(transaction(buyerThreeWallet, oneEth)));
 
-    const totalRaised = await espeoToken.totalRaised();
+    const totalRaised = await avocadoCoin.totalRaised();
     assert.equal(totalRaised.toNumber(), minCap, 'Total raised amount mismatch');
 
     // REQ004 should allow token transfer
-    await espeoToken.transfer(buyerTwoWallet, 1, { from: buyerOneWallet });
+    await avocadoCoin.transfer(buyerTwoWallet, 1, { from: buyerOneWallet });
   });
 
   it('should close after the max cap is reached and allow token transfers afterwards', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
     // should allow going over max cap
-    await espeoToken.sendTransaction(transaction(buyerTwoWallet, maxCap));
+    await avocadoCoin.sendTransaction(transaction(buyerTwoWallet, maxCap));
 
     // should close after reaching max cap
-    await assertExpectedError(espeoToken.sendTransaction(transaction(buyerThreeWallet, oneEth)));
+    await assertExpectedError(avocadoCoin.sendTransaction(transaction(buyerThreeWallet, oneEth)));
 
-    const totalRaised = await espeoToken.totalRaised();
+    const totalRaised = await avocadoCoin.totalRaised();
     assert.equal(totalRaised.toNumber(), maxCap + oneEth, 'Total raised amount mismatch');
   });
 
@@ -135,55 +135,55 @@ contract('AvacadoCoinIco', accounts => {
     const initialFundsWalletBalance = ethBalance(fundsWallet);
     const expectedBalanceGrowth = (wei) => initialFundsWalletBalance + wei;
 
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
 
-    assert.equal(ethBalance(espeoToken.address), 0, 'Contract balance mismatch');
+    assert.equal(ethBalance(avocadoCoin.address), 0, 'Contract balance mismatch');
     assert.equal(ethBalance(fundsWallet), expectedBalanceGrowth(oneEth), 'Funds wallet balance mismatch');
 
-    await espeoToken.sendTransaction(transaction(buyerTwoWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerTwoWallet, oneEth));
 
-    assert.equal(ethBalance(espeoToken.address), 0, 'Contract balance mismatch');
+    assert.equal(ethBalance(avocadoCoin.address), 0, 'Contract balance mismatch');
     assert.equal(ethBalance(fundsWallet), expectedBalanceGrowth(oneEth * 2), 'Funds wallet balance mismatch');
   });
 
   // REQ004: Tokens are going to be available for transfers only after the ICO ends,
   it('should not allow token transfers before ICO', async () => {
     const startTimestamp = timeController.currentTimestamp() + 3600;
-    const espeoToken = await AvacadoCoinIco.new(fundsWallet, startTimestamp, minCap, maxCap);
+    const avocadoCoin = await AvocadoCoinIco.new(fundsWallet, startTimestamp, minCap, maxCap);
 
     // should not allow token transfer before ICO
-    await assertExpectedError(espeoToken.transfer(buyerTwoWallet, 1, { from: buyerOneWallet }));
+    await assertExpectedError(avocadoCoin.transfer(buyerTwoWallet, 1, { from: buyerOneWallet }));
   });
 
   it('should not allow token transfers during ICO', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
 
     // should not allow token transfer during ICO
-    await assertExpectedError(espeoToken.transfer(buyerTwoWallet, 1, { from: buyerOneWallet }));
+    await assertExpectedError(avocadoCoin.transfer(buyerTwoWallet, 1, { from: buyerOneWallet }));
   });
 
-  // REQ005: The tokens are going to be sold at a flat rate of 1 ETH : 50 ESP, 
+  // REQ005: The tokens are going to be sold at a flat rate of 1 ETH : 50 CADO, 
   // with added +50% bonus during the first week.
   it('should be sold with +50% bonus during the first week', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
 
-    const buyerOneBalance = await espeoToken.balanceOf(buyerOneWallet);
+    const buyerOneBalance = await avocadoCoin.balanceOf(buyerOneWallet);
     assert.equal(buyerOneBalance.toNumber(), 50 * oneEth * 1.5, 'Buyer one token balance mismatch');
   });
 
   it('should be sold with no bonus after the first week', async () => {
-    const espeoToken = await createToken();
+    const avocadoCoin = await createToken();
 
     await timeController.addDays(7);
-    await espeoToken.sendTransaction(transaction(buyerOneWallet, oneEth));
+    await avocadoCoin.sendTransaction(transaction(buyerOneWallet, oneEth));
 
-    const buyerOneBalance = await espeoToken.balanceOf(buyerOneWallet);
+    const buyerOneBalance = await avocadoCoin.balanceOf(buyerOneWallet);
     assert.equal(buyerOneBalance.toNumber(), 50 * oneEth, 'Buyer one token balance mismatch');
   });
 
